@@ -1,0 +1,13 @@
+/* Acid Yellow — 酸性黄（黑底高饱和黄绿，现代高对比） */
+/* 编辑器语法配色映射：monokai */
+:root {
+  --accent-rgb: 224, 255, 0;
+  --accent2-rgb: 255, 224, 0;
+  --accent3-rgb: 180, 255, 0;
+  --blue-rgb: 200, 255, 40;
+  --textmuted-rgb: 190, 200, 120;
+  --bg-deep: #080a00;
+  --bg-base: #0c0e00;
+  --bg-far: #161a02;
+  --text-main: #f3f7c0;
+}

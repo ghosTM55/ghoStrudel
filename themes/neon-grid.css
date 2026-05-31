@@ -1,0 +1,13 @@
+/* Neon Grid — 霓虹网格（默认赛博风，青 / 品红 / 紫） */
+/* 编辑器语法配色映射：strudelTheme（见 index.html 的 THEMES 表） */
+:root {
+  --accent-rgb: 0, 245, 255;
+  --accent2-rgb: 255, 43, 214;
+  --accent3-rgb: 124, 60, 255;
+  --blue-rgb: 22, 135, 255;
+  --textmuted-rgb: 171, 232, 245;
+  --bg-deep: #01030a;
+  --bg-base: #020611;
+  --bg-far: #061428;
+  --text-main: #dffcff;
+}

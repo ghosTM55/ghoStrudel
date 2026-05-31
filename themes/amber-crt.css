@@ -1,0 +1,13 @@
+/* Amber CRT — 琥珀单色 CRT（黑底琥珀黄，复古终端） */
+/* 编辑器语法配色映射：gruvboxDark */
+:root {
+  --accent-rgb: 255, 176, 0;
+  --accent2-rgb: 255, 209, 102;
+  --accent3-rgb: 255, 140, 0;
+  --blue-rgb: 255, 196, 60;
+  --textmuted-rgb: 200, 160, 90;
+  --bg-deep: #070400;
+  --bg-base: #0d0800;
+  --bg-far: #1a1003;
+  --text-main: #ffd9a0;
+}

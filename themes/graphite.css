@@ -1,0 +1,13 @@
+/* Graphite — 石墨灰（中性深灰底，银灰强调，冷静极简） */
+/* 编辑器语法配色映射：vscodeDark */
+:root {
+  --accent-rgb: 194, 202, 210;
+  --accent2-rgb: 150, 158, 168;
+  --accent3-rgb: 120, 130, 142;
+  --blue-rgb: 160, 172, 186;
+  --textmuted-rgb: 140, 148, 158;
+  --bg-deep: #0f1216;
+  --bg-base: #16191e;
+  --bg-far: #20242b;
+  --text-main: #e8ecf0;
+}

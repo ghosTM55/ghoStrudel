@@ -1,0 +1,826 @@
+:root {
+  color-scheme: dark;
+  --app-font:
+    "IoskeleyMono Nerd Font",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
+
+  /* ── theme tokens (overridden by themes/*.css; defaults = Neon Grid) ── */
+  --accent-rgb: 0, 245, 255;
+  --accent2-rgb: 255, 43, 214;
+  --accent3-rgb: 124, 60, 255;
+  --blue-rgb: 22, 135, 255;
+  --textmuted-rgb: 171, 232, 245;
+  --bg-deep: #01030a;
+  --bg-base: #020611;
+  --bg-far: #061428;
+  --text-main: #dffcff;
+
+  /* ── derived from tokens above ── */
+  --bg-core: var(--bg-base);
+  --bg-grid: rgba(var(--accent-rgb), 0.08);
+  --panel: rgba(2, 12, 28, 0.78);
+  --panel-strong: rgba(3, 18, 38, 0.92);
+  --neon-cyan: rgb(var(--accent-rgb));
+  --neon-blue: rgb(var(--blue-rgb));
+  --neon-magenta: rgb(var(--accent2-rgb));
+  --neon-violet: rgb(var(--accent3-rgb));
+  --text-muted: rgba(var(--textmuted-rgb), 0.62);
+  --line-dim: rgba(var(--accent-rgb), 0.16);
+  --visual-playhead-x: 40vw;
+  --blur-feather: 8ch;
+  font-family: var(--app-font);
+  background: var(--bg-core);
+  color: var(--text-main);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(var(--accent-rgb), 0.26), transparent 26%),
+    radial-gradient(circle at 88% 18%, rgba(var(--accent2-rgb), 0.18), transparent 28%),
+    radial-gradient(circle at 52% 92%, rgba(var(--blue-rgb), 0.24), transparent 38%),
+    linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-base) 44%, var(--bg-far) 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(var(--accent-rgb), 0.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--accent-rgb), 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, transparent 0%, rgba(var(--accent-rgb), 0.05) 50%, transparent 100%);
+  background-size: 42px 42px, 42px 42px, 100% 6px;
+  mask-image: radial-gradient(circle at 50% 50%, black 0%, black 58%, transparent 100%);
+  opacity: 0.62;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(var(--visual-playhead-x) + var(--blur-feather));
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(1, 5, 14, 0.66) 0%,
+      rgba(1, 5, 14, 0.52) calc(var(--visual-playhead-x) - 18ch),
+      rgba(1, 5, 14, 0.28) var(--visual-playhead-x),
+      transparent 100%
+    );
+  backdrop-filter: blur(18px) saturate(0.88) brightness(0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(0.88) brightness(0.72);
+  mask-image:
+    linear-gradient(
+      90deg,
+      black 0%,
+      black calc(var(--visual-playhead-x) - 10ch),
+      rgba(0, 0, 0, 0.72) var(--visual-playhead-x),
+      transparent 100%
+    );
+}
+
+body > canvas {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  opacity: 0.82;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  min-height: 100vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+
+.app::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: var(--visual-playhead-x);
+  width: 2px;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(var(--accent-rgb), 0.16) 10%,
+      rgba(var(--accent-rgb), 0.55) 50%,
+      rgba(var(--accent-rgb), 0.16) 90%,
+      transparent 100%
+    );
+  box-shadow:
+    0 0 12px rgba(var(--accent-rgb), 0.36),
+    0 0 30px rgba(var(--accent-rgb), 0.16),
+    -10px 0 28px rgba(var(--accent-rgb), 0.08),
+    10px 0 28px rgba(var(--accent2-rgb), 0.08);
+}
+
+.palette-trigger {
+  justify-self: center;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  max-width: min(84vw, 680px);
+  border: 1px solid rgba(var(--accent-rgb), 0.34);
+  border-radius: 999px;
+  padding: 11px 17px;
+  color: var(--text-main);
+  background: linear-gradient(135deg, rgba(2, 12, 28, 0.98), rgba(5, 24, 46, 0.96));
+  box-shadow: inset 0 0 18px rgba(var(--accent-rgb), 0.05);
+  font: inherit;
+  cursor: pointer;
+  opacity: 1;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.palette-trigger:hover,
+.palette-trigger:focus-visible,
+.palette-trigger[aria-expanded="true"] {
+  border-color: rgba(var(--accent-rgb), 0.72);
+  box-shadow:
+    0 0 24px rgba(var(--accent-rgb), 0.28),
+    0 0 44px rgba(var(--accent2-rgb), 0.12),
+    inset 0 0 24px rgba(var(--accent-rgb), 0.08);
+  outline: none;
+}
+
+.palette-vinyl {
+  position: relative;
+  flex: 0 0 auto;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #dffcff 0 8%, #07111f 9% 16%, transparent 17%),
+    repeating-radial-gradient(circle at 50% 50%, #050711 0 3px, #121827 4px 5px);
+  border: 1px solid rgba(var(--accent-rgb), 0.34);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.78);
+}
+
+.palette-vinyl::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 1px;
+  height: 8px;
+  background: rgba(var(--accent-rgb), 0.7);
+  transform: translateX(-50%);
+  border-radius: 999px;
+}
+
+.palette-trigger.is-playing .palette-vinyl {
+  animation: vinyl-spin 1.1s linear infinite;
+  border-color: rgba(var(--accent2-rgb), 0.72);
+  box-shadow:
+    0 0 14px rgba(var(--accent2-rgb), 0.28),
+    inset 0 0 10px rgba(0, 0, 0, 0.78);
+}
+
+@keyframes vinyl-spin {
+  to { transform: rotate(360deg); }
+}
+
+.palette-trigger__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  line-height: 1;
+}
+
+.palette-trigger__eyebrow {
+  flex: 0 0 auto;
+  color: rgba(var(--accent-rgb), 0.82);
+  font-size: clamp(16px, 2.1vw, 21px);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+#current-track-label {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-main);
+  font-size: clamp(16px, 2.1vw, 21px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 0 14px rgba(var(--accent-rgb), 0.32);
+}
+
+.palette-trigger kbd {
+  border: 1px solid rgba(var(--accent-rgb), 0.26);
+  border-radius: 999px;
+  padding: 3px 7px;
+  color: rgba(223, 252, 255, 0.68);
+  background: rgba(var(--accent-rgb), 0.06);
+  font: inherit;
+  font-size: 10px;
+}
+
+.track-palette[hidden] {
+  display: none;
+}
+
+.track-palette {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: start center;
+  padding-top: 14vh;
+}
+
+.palette-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(var(--accent-rgb), 0.12), transparent 32%),
+    rgba(1, 4, 12, 0.68);
+  backdrop-filter: blur(7px);
+}
+
+.palette-panel {
+  position: relative;
+  width: min(680px, calc(100vw - 32px));
+  border: 1px solid rgba(var(--accent-rgb), 0.34);
+  border-radius: 22px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(2, 12, 28, 0.96), rgba(5, 18, 38, 0.9));
+  box-shadow:
+    0 0 44px rgba(var(--accent-rgb), 0.28),
+    0 0 88px rgba(var(--accent3-rgb), 0.14),
+    inset 0 0 34px rgba(var(--accent-rgb), 0.06);
+  overflow: hidden;
+}
+
+.palette-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.18), transparent);
+  transform: translateX(-100%);
+  animation: scanline 3.6s linear infinite;
+}
+
+@keyframes scanline {
+  to { transform: translateX(100%); }
+}
+
+.palette-kicker {
+  margin: 0 0 6px;
+  color: rgba(var(--accent2-rgb), 0.72);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+}
+
+.palette-panel h2 {
+  margin: 0 0 14px;
+  color: var(--text-main);
+  font-size: clamp(22px, 3vw, 34px);
+  letter-spacing: -0.05em;
+  text-shadow: 0 0 16px rgba(var(--accent-rgb), 0.36);
+}
+
+.track-search {
+  width: 100%;
+  border: 1px solid rgba(var(--accent-rgb), 0.24);
+  border-radius: 14px;
+  padding: 13px 14px;
+  color: var(--text-main);
+  background: rgba(0, 7, 18, 0.68);
+  box-shadow: inset 0 0 20px rgba(var(--accent-rgb), 0.04);
+  font: inherit;
+  outline: none;
+}
+
+.track-search:focus {
+  border-color: rgba(var(--accent-rgb), 0.7);
+  box-shadow:
+    0 0 0 3px rgba(var(--accent-rgb), 0.1),
+    inset 0 0 20px rgba(var(--accent-rgb), 0.08);
+}
+
+.track-list {
+  display: grid;
+  gap: 8px;
+  max-height: min(42vh, 360px);
+  margin-top: 12px;
+  overflow: auto;
+}
+
+.track-option {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  border: 1px solid rgba(var(--accent-rgb), 0.12);
+  border-radius: 14px;
+  padding: 11px 12px;
+  color: var(--text-main);
+  background: rgba(0, 12, 28, 0.38);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.track-option small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.track-option:hover,
+.track-option.is-active {
+  border-color: rgba(var(--accent-rgb), 0.72);
+  background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.14), rgba(var(--accent2-rgb), 0.06));
+  box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.18);
+}
+
+.track-option.is-selected {
+  border-color: rgba(var(--accent2-rgb), 0.6);
+}
+
+.palette-hint {
+  margin: 12px 2px 0;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.editor-card {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: rgba(1, 5, 14, 0.04);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+#editor-mount,
+#editor-mount > div {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+#editor-mount > strudel-editor {
+  display: none;
+}
+
+#editor-mount .cm-editor,
+#editor-mount .cm-scroller,
+#editor-mount .cm-content {
+  font-family: var(--app-font) !important;
+}
+
+#editor-mount > div,
+#editor-mount .cm-editor,
+#editor-mount .cm-scroller,
+#editor-mount .cm-content {
+  background-color: transparent !important;
+}
+
+#editor-mount .cm-editor {
+  height: 100%;
+  color: var(--text-main);
+}
+
+#editor-mount .cm-scroller {
+  overflow: auto !important;
+}
+
+#editor-mount .cm-gutters {
+  background-color: rgba(1, 8, 18, 0.28) !important;
+  border-right-color: var(--line-dim) !important;
+  color: rgba(var(--accent-rgb), 0.44) !important;
+}
+
+#editor-mount .cm-line {
+  text-shadow:
+    0 0 5px rgba(var(--accent-rgb), 0.18),
+    0 1px 3px rgba(0, 0, 0, 0.96);
+}
+
+#editor-mount .cm-activeLine {
+  background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.1), transparent 74%) !important;
+}
+
+#editor-mount .cm-activeLineGutter {
+  background: rgba(var(--accent-rgb), 0.08) !important;
+  color: var(--neon-cyan) !important;
+}
+
+#editor-mount .cm-cursor {
+  border-left-color: var(--neon-cyan) !important;
+  filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.78));
+}
+
+#editor-mount .cm-selectionBackground,
+#editor-mount .cm-focused .cm-selectionBackground {
+  background: rgba(var(--accent-rgb), 0.22) !important;
+}
+
+/* inline 可视化（._pianoroll / ._punchcard）：垫深色底 + 主题色描边，
+   从全屏背景音轨里分离出来看得更清楚（全局背景 canvas 在 body 下，不受影响）*/
+#editor-mount .cm-content canvas {
+  background: rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  border-radius: 6px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  margin: 3px 0;
+}
+
+@media (max-width: 760px) {
+  .navbar {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .brand-name {
+    display: none;
+  }
+  .palette-trigger {
+    max-width: 60vw;
+    padding: 9px 13px;
+  }
+  .palette-trigger kbd {
+    display: none;
+  }
+  .theme-hint {
+    display: none;
+  }
+  .theme-switcher {
+    gap: 6px;
+    padding: 5px 8px;
+  }
+  .theme-swatch {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ── navbar: logo (left) · track trigger (center) · theme switcher (right) ── */
+.navbar {
+  position: relative;
+  z-index: 10;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.18);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.22));
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+}
+
+.brand {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--neon-cyan);
+}
+
+.brand-mark {
+  display: inline-flex;
+  filter: drop-shadow(0 0 9px rgba(var(--accent-rgb), 0.55));
+}
+
+.brand-mark svg {
+  display: block;
+}
+
+.brand-name {
+  color: var(--text-main);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 16px rgba(var(--accent-rgb), 0.42);
+}
+
+.nav-right {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 主题切换：一排发光色板，呼应霓虹/唱片视觉，替代普通下拉 */
+.theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px;
+  border: 1px solid rgba(var(--accent-rgb), 0.22);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.34);
+  box-shadow: inset 0 0 16px rgba(var(--accent-rgb), 0.05);
+}
+
+.theme-swatch {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  cursor: pointer;
+  /* 每个色板的填充渐变由 JS 内联设置（该主题代表色） */
+  /* 未选中：压暗 + 去饱和 + 缩小，让选中的那个明显凸显 */
+  opacity: 0.38;
+  filter: saturate(0.55) brightness(0.78);
+  transform: scale(0.86);
+  transition: transform 160ms ease, box-shadow 160ms ease,
+    border-color 140ms ease, opacity 160ms ease, filter 160ms ease;
+}
+
+/* hover：临时点亮做预览 */
+.theme-swatch:hover,
+.theme-swatch:focus-visible {
+  opacity: 1;
+  filter: none;
+  transform: translateY(-1px) scale(1.1);
+  border-color: rgba(255, 255, 255, 0.65);
+  outline: none;
+}
+
+/* 选中：全彩、放大、强发光环，明显高于其它 */
+.theme-swatch.is-active {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.2);
+  border-color: #fff;
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(var(--accent-rgb), 0.7),
+    0 0 22px rgba(var(--accent-rgb), 0.85);
+  z-index: 1;
+}
+
+.theme-swatch.is-active::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+/* hover 名称气泡 */
+.theme-swatch::before {
+  content: attr(aria-label);
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 5px 9px;
+  border-radius: 9px;
+  white-space: nowrap;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.92);
+  border: 1px solid rgba(var(--accent-rgb), 0.36);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+  z-index: 40;
+}
+
+.theme-swatch:hover::before,
+.theme-swatch:focus-visible::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.theme-hint {
+  border: 1px solid rgba(var(--accent-rgb), 0.26);
+  border-radius: 999px;
+  padding: 5px 11px;
+  color: rgba(var(--textmuted-rgb), 0.9);
+  background: rgba(var(--accent-rgb), 0.06);
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  cursor: default;
+}
+
+/* 帮助 / tutorial 触发按钮 */
+.help-trigger {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(var(--accent-rgb), 0.34);
+  border-radius: 50%;
+  color: var(--neon-cyan);
+  background: rgba(0, 0, 0, 0.34);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
+}
+
+.help-trigger:hover,
+.help-trigger:focus-visible,
+.help-trigger[aria-expanded="true"] {
+  border-color: rgba(var(--accent-rgb), 0.75);
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.28);
+  outline: none;
+}
+
+/* 曲目列表分割线（cheatsheet 速查表 ↑ / 正式曲目 ↓）*/
+.track-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 4px 4px;
+  color: rgba(var(--accent-rgb), 0.55);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.track-divider::before,
+.track-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.34), transparent);
+}
+
+/* tutorial 弹窗（复用命令面板的霓虹风格）*/
+.tutorial[hidden] {
+  display: none;
+}
+
+.tutorial {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: start center;
+  padding-top: 12vh;
+}
+
+.tutorial-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(var(--accent-rgb), 0.12), transparent 32%),
+    rgba(1, 4, 12, 0.68);
+  backdrop-filter: blur(7px);
+}
+
+.tutorial-panel {
+  position: relative;
+  width: min(620px, calc(100vw - 32px));
+  border: 1px solid rgba(var(--accent-rgb), 0.34);
+  border-radius: 22px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, rgba(2, 12, 28, 0.96), rgba(5, 18, 38, 0.9));
+  box-shadow:
+    0 0 44px rgba(var(--accent-rgb), 0.26),
+    0 0 88px rgba(var(--accent3-rgb), 0.14),
+    inset 0 0 34px rgba(var(--accent-rgb), 0.06);
+}
+
+.tutorial-kicker {
+  margin: 0 0 6px;
+  color: rgba(var(--accent2-rgb), 0.72);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+}
+
+.tutorial-panel h2 {
+  margin: 0 0 10px;
+  color: var(--text-main);
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 16px rgba(var(--accent-rgb), 0.36);
+}
+
+.tutorial-lead {
+  margin: 0 0 14px;
+  color: rgba(var(--textmuted-rgb), 0.95);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tutorial-list {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 9px;
+}
+
+.tutorial-list li {
+  color: var(--text-main);
+  font-size: 13px;
+  line-height: 1.5;
+  padding-left: 14px;
+  position: relative;
+}
+
+.tutorial-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6);
+}
+
+.tutorial-panel kbd {
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  border-radius: 6px;
+  padding: 1px 6px;
+  color: var(--text-main);
+  background: rgba(var(--accent-rgb), 0.08);
+  font: inherit;
+  font-size: 11px;
+}
+
+.tutorial-panel code {
+  color: var(--neon-cyan);
+  font-size: 12px;
+}
+
+.tutorial-note {
+  margin: 0 0 18px;
+  color: rgba(var(--textmuted-rgb), 0.8);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.tutorial-close {
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  border-radius: 999px;
+  padding: 9px 20px;
+  color: var(--text-main);
+  background: rgba(var(--accent-rgb), 0.1);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.tutorial-close:hover,
+.tutorial-close:focus-visible {
+  border-color: rgba(var(--accent-rgb), 0.8);
+  box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.3);
+  outline: none;
+}

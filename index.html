@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ghoStrudel</title>
+  <link rel="stylesheet" href="./src/style.css" />
+  <link id="theme-css" rel="stylesheet" href="./themes/neon-grid.css" />
+  <script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+</head>
+<body>
+  <main class="app">
+    <header class="navbar">
+      <a class="brand" href="./" aria-label="ghoStrudel">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="25" height="25">
+            <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="9" stroke-dasharray="40 9" />
+              <circle cx="12" cy="12" r="5" stroke-dasharray="22 6" />
+            </g>
+            <circle cx="12" cy="12" r="1.7" fill="currentColor" />
+          </svg>
+        </span>
+        <span class="brand-name">ghoStrudel</span>
+      </a>
+
+      <button id="palette-trigger" class="palette-trigger" type="button" aria-haspopup="dialog" aria-controls="track-palette">
+        <span class="palette-vinyl" aria-hidden="true"></span>
+        <span class="palette-trigger__copy">
+          <span class="palette-trigger__eyebrow">Having fun with</span>
+          <strong id="current-track-label">cheatsheets</strong>
+        </span>
+        <kbd>⌘K</kbd>
+      </button>
+
+      <div class="nav-right">
+        <kbd class="theme-hint" title="Switch theme: Ctrl+H previous, Ctrl+L next (vim h/l), or click a swatch">Ctrl+H / Ctrl+L</kbd>
+        <div class="theme-switcher" id="theme-switcher" role="group" aria-label="Switch theme"></div>
+        <button id="help-trigger" class="help-trigger" type="button" aria-haspopup="dialog" aria-controls="tutorial" title="Quick start">?</button>
+      </div>
+    </header>
+
+    <div id="track-palette" class="track-palette" hidden>
+      <div class="palette-backdrop" data-close-palette></div>
+      <section class="palette-panel" role="dialog" aria-modal="true" aria-labelledby="palette-title">
+        <p class="palette-kicker">GHOSTRUDEL</p>
+        <h2 id="palette-title">Having fun with...</h2>
+        <input id="track-search" class="track-search" type="search" autocomplete="off" spellcheck="false" placeholder="Search sketches" />
+        <div id="track-list" class="track-list" role="listbox" aria-label="Available Strudel sketches"></div>
+        <p class="palette-hint">Enter to load · Esc to close · ↑/↓ or Ctrl+P/Ctrl+N to move</p>
+      </section>
+    </div>
+
+    <div id="tutorial" class="tutorial" hidden>
+      <div class="tutorial-backdrop" data-close-tutorial></div>
+      <section class="tutorial-panel" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+        <p class="tutorial-kicker">GHOSTRUDEL</p>
+        <h2 id="tutorial-title">Quick start</h2>
+        <p class="tutorial-lead">A local Strudel workspace for writing, playing and switching live-coded tracks. Pick a track, edit the code, then re-evaluate it while it runs.</p>
+        <ul class="tutorial-list">
+          <li><kbd>⌘/Ctrl</kbd> <kbd>K</kbd> — open the track picker, search a sketch, then press <kbd>Enter</kbd> to load it</li>
+          <li><kbd>Ctrl</kbd> <kbd>Enter</kbd> — play / re-evaluate the current code · <kbd>Ctrl</kbd> <kbd>.</kbd> — stop</li>
+          <li><strong>Make a new track:</strong> copy a sample from <code>tracks/</code>, edit the parts, then reload or switch to it from the picker</li>
+          <li><strong>Live edit:</strong> change notes or patterns in the editor, then press <kbd>Ctrl</kbd> <kbd>Enter</kbd> to hot-swap without restarting the clock</li>
+          <li><strong>Visuals:</strong> keep <code>._pianoroll()</code> for melodic parts, <code>._punchcard()</code> for drums, and a final <code>.pianoroll(...)</code> / <code>.punchcard(...)</code> for the full background</li>
+          <li><strong>Themes:</strong> click the swatches top-right, or press <kbd>Ctrl</kbd> <kbd>H</kbd> / <kbd>Ctrl</kbd> <kbd>L</kbd></li>
+        </ul>
+        <p class="tutorial-note">Browser edits are temporary — copy good bits back into the matching <code>.strudel.js</code> file to keep them.</p>
+        <button class="tutorial-close" type="button" data-close-tutorial>Got it</button>
+      </section>
+    </div>
+
+    <section class="editor-card">
+      <div id="editor-mount"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    const DEFAULT_TRACK = {
+      label: 'Cheatsheets — Strudel Features',
+      file: 'src/cheatsheets.strudel.js'
+    }
+    // 页面默认打开的曲目（cheatsheet 仍排在列表最上，只是不作为首屏曲目）
+    const DEFAULT_OPEN = 'tracks/Shanghai.strudel.js'
+
+    // 页面主题：editor=映射的 Strudel 内置语法配色；label=显示名；sw=色板代表色 [主色, 次色]
+    const THEMES = {
+      'neon-grid': { editor: 'strudelTheme', label: 'Neon Grid', sw: ['#00f5ff', '#ff2bd6'] },
+      'mono-terminal': { editor: 'greenText', label: 'Mono Terminal', sw: ['#39ff88', '#78ffb4'] },
+      'sunset-wave': { editor: 'dracula', label: 'Sunset Wave', sw: ['#ff6ec7', '#ff9f43'] },
+      'amber-crt': { editor: 'gruvboxDark', label: 'Amber CRT', sw: ['#ffb000', '#ffd166'] },
+      'acid-yellow': { editor: 'monokai', label: 'Acid Yellow', sw: ['#e0ff00', '#ffe000'] },
+      'mono-noir': { editor: 'blackscreen', label: 'Mono Noir', sw: ['#f0f0f0', '#b4b8bc'] },
+      'graphite': { editor: 'vscodeDark', label: 'Graphite', sw: ['#c2cad2', '#969ea8'] }
+    }
+    const DEFAULT_THEME = 'neon-grid'
+    const THEME_STORAGE_KEY = 'strudel-lab-theme'
+
+    const mount = document.querySelector('#editor-mount')
+    const paletteTrigger = document.querySelector('#palette-trigger')
+    const palette = document.querySelector('#track-palette')
+    const search = document.querySelector('#track-search')
+    const trackList = document.querySelector('#track-list')
+    const currentTrackLabel = document.querySelector('#current-track-label')
+    const themeLink = document.querySelector('#theme-css')
+    const themeSwitcher = document.querySelector('#theme-switcher')
+    const helpTrigger = document.querySelector('#help-trigger')
+    const tutorial = document.querySelector('#tutorial')
+
+    let tracks = []
+    let filteredTracks = []
+    let activePaletteIndex = 0
+    let selectedFile = DEFAULT_TRACK.file
+    let isPlaying = false
+    // 单一、可复用的 <strudel-editor>，切歌时不再重建（避免僵尸 editor / 调度器残留）
+    let editorEl = null
+    let currentTheme = DEFAULT_THEME
+
+    function getEditor() {
+      return editorEl?.editor || null
+    }
+
+    function setPlaying(nextPlaying) {
+      isPlaying = nextPlaying
+      paletteTrigger.classList.toggle('is-playing', isPlaying)
+    }
+
+    async function evaluatePattern() {
+      try {
+        await getEditor()?.evaluate()
+        setPlaying(true)
+      } catch (error) {
+        console.warn('evaluate failed', error)
+      }
+    }
+
+    function focusEditor() {
+      window.requestAnimationFrame(() => {
+        document.querySelector('#editor-mount .cm-content')?.focus()
+      })
+    }
+
+    function renderThemeSwitcher() {
+      themeSwitcher.replaceChildren(
+        ...Object.entries(THEMES).map(([name, meta]) => {
+          const swatch = document.createElement('button')
+          swatch.type = 'button'
+          swatch.className = 'theme-swatch'
+          swatch.dataset.theme = name
+          swatch.setAttribute('aria-label', meta.label)
+          swatch.style.background = `linear-gradient(135deg, ${meta.sw[0]} 0 50%, ${meta.sw[1]} 50% 100%)`
+          swatch.addEventListener('click', () => applyTheme(name))
+          return swatch
+        })
+      )
+    }
+
+    function applyTheme(name, { persist = true } = {}) {
+      if (!THEMES[name]) name = DEFAULT_THEME
+      currentTheme = name
+      themeLink.setAttribute('href', `./themes/${name}.css`)
+      document.documentElement.dataset.theme = name
+      themeSwitcher.querySelectorAll('.theme-swatch').forEach((sw) => {
+        sw.classList.toggle('is-active', sw.dataset.theme === name)
+        sw.setAttribute('aria-pressed', String(sw.dataset.theme === name))
+      })
+      try {
+        getEditor()?.setTheme(THEMES[name].editor)
+      } catch (error) {
+        console.warn('setTheme failed', error)
+      }
+      if (persist) {
+        try {
+          localStorage.setItem(THEME_STORAGE_KEY, name)
+        } catch {}
+      }
+    }
+
+    function cycleTheme(dir = 1) {
+      const keys = Object.keys(THEMES)
+      const index = keys.indexOf(currentTheme)
+      const next = keys[(index + dir + keys.length) % keys.length]
+      applyTheme(next)
+    }
+
+    function readSavedTheme() {
+      try {
+        const saved = localStorage.getItem(THEME_STORAGE_KEY)
+        if (saved && THEMES[saved]) return saved
+      } catch {}
+      return DEFAULT_THEME
+    }
+
+    function normaliseFile(file) {
+      return file?.replace(/^\.\//, '')
+    }
+
+    function labelFromFile(file) {
+      return file
+        .split('/')
+        .pop()
+        .replace(/\.strudel\.js$/, '')
+        .replace(/\.strudel$/, '')
+        .replace(/[-_]/g, ' ')
+    }
+
+    async function discoverTrackFiles() {
+      try {
+        const res = await fetch('./tracks/', { cache: 'no-store' })
+        if (!res.ok) return []
+
+        const html = await res.text()
+        const doc = new DOMParser().parseFromString(html, 'text/html')
+
+        return [...doc.querySelectorAll('a')]
+          .map((link) => decodeURIComponent(link.getAttribute('href') || ''))
+          .filter((href) => /\.strudel(\.js)?$/.test(href))
+          .filter((href) => !href.includes('/'))
+          .map((name) => ({
+            label: labelFromFile(name),
+            file: `tracks/${name}`
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label))
+      } catch {
+        return []
+      }
+    }
+
+    function updateCurrentTrack(file) {
+      const track = tracks.find((item) => item.file === file)
+      currentTrackLabel.textContent = track?.label || labelFromFile(file)
+      selectedFile = file
+    }
+
+    function renderTrackList(query = '') {
+      const needle = query.trim().toLowerCase()
+      filteredTracks = tracks.filter((track) => {
+        const haystack = `${track.label} ${track.file}`.toLowerCase()
+        return haystack.includes(needle)
+      })
+
+      if (activePaletteIndex >= filteredTracks.length) activePaletteIndex = 0
+
+      const items = []
+      let dividerInserted = false
+      filteredTracks.forEach((track, index) => {
+        // 在第一首正式曲目（tracks/）前插一条分割线，把上面的 cheatsheet 速查表分开
+        if (!dividerInserted && index > 0 && track.file.startsWith('tracks/')) {
+          const divider = document.createElement('div')
+          divider.className = 'track-divider'
+          divider.textContent = 'Tracks'
+          items.push(divider)
+          dividerInserted = true
+        }
+
+        const option = document.createElement('button')
+        const label = document.createElement('span')
+        const path = document.createElement('small')
+
+        option.type = 'button'
+        option.className = 'track-option'
+        option.role = 'option'
+        option.dataset.file = track.file
+        option.setAttribute('aria-selected', String(track.file === selectedFile))
+        option.classList.toggle('is-active', index === activePaletteIndex)
+        option.classList.toggle('is-selected', track.file === selectedFile)
+
+        label.textContent = track.label
+        path.textContent = track.file
+        option.append(label, path)
+        option.addEventListener('click', () => chooseTrack(track.file))
+        items.push(option)
+      })
+      trackList.replaceChildren(...items)
+    }
+
+    function openPalette() {
+      palette.hidden = false
+      paletteTrigger.setAttribute('aria-expanded', 'true')
+      activePaletteIndex = Math.max(0, tracks.findIndex((track) => track.file === selectedFile))
+      search.value = ''
+      renderTrackList()
+      window.requestAnimationFrame(() => search.focus())
+    }
+
+    function closePalette({ focusTrigger = true } = {}) {
+      palette.hidden = true
+      paletteTrigger.setAttribute('aria-expanded', 'false')
+      if (focusTrigger) paletteTrigger.focus()
+    }
+
+    function openTutorial() {
+      tutorial.hidden = false
+      helpTrigger.setAttribute('aria-expanded', 'true')
+    }
+
+    function closeTutorial({ focusTrigger = true } = {}) {
+      tutorial.hidden = true
+      helpTrigger.setAttribute('aria-expanded', 'false')
+      if (focusTrigger) helpTrigger.focus()
+    }
+
+    async function chooseTrack(file) {
+      const wasPlaying = isPlaying
+
+      closePalette({ focusTrigger: false })
+      const url = new URL(window.location.href)
+      url.searchParams.set('file', file)
+      window.history.replaceState({}, '', url)
+
+      await loadPattern(file)
+      focusEditor()
+
+      if (wasPlaying) {
+        // 上一首在播 → 无缝热替换：scheduler 仍在跑，evaluate 不重启时钟，
+        // 在当前 cycle 位置接上新曲（hush 清掉旧 pattern，不会两首叠加）。
+        window.requestAnimationFrame(() => {
+          evaluatePattern()
+        })
+      }
+    }
+
+    async function loadPattern(file) {
+      const res = await fetch(file, { cache: 'no-store' })
+      if (!res.ok) {
+        throw new Error(`Failed to load ${file}: ${res.status}`)
+      }
+
+      const code = await res.text()
+      document.title = `ghoStrudel — ${labelFromFile(file)}`
+
+      if (!editorEl) {
+        // 首次：创建唯一的 editor（connectedCallback 会用 code 属性初始化）
+        editorEl = document.createElement('strudel-editor')
+        editorEl.setAttribute('code', code)
+        mount.replaceChildren(editorEl)
+      } else {
+        // 切歌：复用同一 editor，只换谱、不 stop。若切歌前在播，由 chooseTrack
+        // 触发 evaluate 做热替换——scheduler 不重启，时钟连续接上新曲。
+        editorEl.setAttribute('code', code)
+      }
+
+      updateCurrentTrack(file)
+    }
+
+    async function boot() {
+      tracks = [DEFAULT_TRACK, ...(await discoverTrackFiles())]
+      const requested = normaliseFile(new URLSearchParams(window.location.search).get('file'))
+      const selected =
+        tracks.find((track) => track.file === requested) ||
+        tracks.find((track) => track.file === DEFAULT_OPEN) ||
+        DEFAULT_TRACK
+
+      await loadPattern(selected.file)
+      renderTrackList()
+      renderThemeSwitcher()
+      applyTheme(readSavedTheme(), { persist: false })
+
+      paletteTrigger.addEventListener('click', openPalette)
+      palette.addEventListener('click', (event) => {
+        if (event.target instanceof HTMLElement && event.target.hasAttribute('data-close-palette')) closePalette()
+      })
+
+      helpTrigger.addEventListener('click', openTutorial)
+      tutorial.addEventListener('click', (event) => {
+        if (event.target instanceof HTMLElement && event.target.hasAttribute('data-close-tutorial')) closeTutorial()
+      })
+
+      search.addEventListener('input', () => {
+        activePaletteIndex = 0
+        renderTrackList(search.value)
+      })
+
+      search.addEventListener('keydown', async (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault()
+          closePalette()
+        }
+
+        const isEmacsNext = event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === 'n'
+        const isEmacsPrevious = event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === 'p'
+
+        if (event.key === 'ArrowDown' || isEmacsNext) {
+          event.preventDefault()
+          activePaletteIndex = Math.min(activePaletteIndex + 1, filteredTracks.length - 1)
+          renderTrackList(search.value)
+        }
+        if (event.key === 'ArrowUp' || isEmacsPrevious) {
+          event.preventDefault()
+          activePaletteIndex = Math.max(activePaletteIndex - 1, 0)
+          renderTrackList(search.value)
+        }
+        if (event.key === 'Enter' && filteredTracks[activePaletteIndex]) {
+          event.preventDefault()
+          await chooseTrack(filteredTracks[activePaletteIndex].file)
+        }
+      })
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !tutorial.hidden) {
+          event.preventDefault()
+          closeTutorial()
+          return
+        }
+
+        const isCommandK = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k'
+        if (isCommandK) {
+          event.preventDefault()
+          palette.hidden ? openPalette() : closePalette()
+        }
+
+        // 编辑器自身的 Ctrl+Enter / Ctrl+. 已处理播放/停止，这里只同步指示灯状态
+        const isEvaluate = event.ctrlKey && !event.metaKey && event.key === 'Enter'
+        const isStop = event.ctrlKey && !event.metaKey && event.key === '.'
+
+        if (isEvaluate && palette.hidden) {
+          setPlaying(true)
+        }
+        if (isStop) {
+          setPlaying(false)
+        }
+      })
+
+      // 主题左右切换（vim 式 h/l）：Ctrl+H 上一个 / Ctrl+L 下一个。
+      // 用捕获阶段 + stopPropagation，确保编辑器聚焦时也能拦到
+      // （否则 Ctrl+H 会被 CodeMirror 当退格吃掉）。不用 Cmd+H/L：mac 上
+      // Cmd+H=隐藏窗口、Cmd+L=聚焦地址栏，被系统/浏览器占用，网页拦不住。
+      window.addEventListener(
+        'keydown',
+        (event) => {
+          if (!event.ctrlKey || event.metaKey || event.altKey) return
+          const key = event.key.toLowerCase()
+          if (key !== 'h' && key !== 'l') return
+          event.preventDefault()
+          event.stopPropagation()
+          cycleTheme(key === 'h' ? -1 : 1)
+        },
+        true
+      )
+    }
+
+    boot().catch((error) => {
+      mount.replaceChildren()
+      const fallback = document.createElement('pre')
+      fallback.textContent = `// Failed to load selected Strudel file\n// ${error.message}`
+      mount.append(fallback)
+      console.error(error)
+    })
+  </script>
+</body>
+</html>

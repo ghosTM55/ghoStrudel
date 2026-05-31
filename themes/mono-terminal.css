@@ -1,0 +1,13 @@
+/* Mono Terminal — 单色终端（黑底磷光绿，极简 CRT 风） */
+/* 编辑器语法配色映射：greenText */
+:root {
+  --accent-rgb: 57, 255, 136;
+  --accent2-rgb: 120, 255, 180;
+  --accent3-rgb: 0, 200, 120;
+  --blue-rgb: 60, 220, 160;
+  --textmuted-rgb: 120, 200, 150;
+  --bg-deep: #000400;
+  --bg-base: #020a05;
+  --bg-far: #02140a;
+  --text-main: #c8ffd8;
+}

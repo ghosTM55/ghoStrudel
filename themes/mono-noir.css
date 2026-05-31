@@ -1,0 +1,13 @@
+/* Mono Noir — 黑白（纯黑底近白字，极高对比单色） */
+/* 编辑器语法配色映射：blackscreen */
+:root {
+  --accent-rgb: 240, 240, 240;
+  --accent2-rgb: 180, 184, 188;
+  --accent3-rgb: 120, 124, 128;
+  --blue-rgb: 200, 204, 208;
+  --textmuted-rgb: 150, 154, 158;
+  --bg-deep: #000000;
+  --bg-base: #050506;
+  --bg-far: #0e0f10;
+  --text-main: #f4f4f5;
+}

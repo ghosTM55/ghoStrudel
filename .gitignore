@@ -1,0 +1,7 @@
+.DS_Store
+.gstack/
+.env
+*.local
+node_modules/
+dist/
+.cache/

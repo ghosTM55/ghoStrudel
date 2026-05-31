@@ -1,0 +1,13 @@
+/* Sunset Wave — 日落合成波（紫 / 橙 / 粉暖调 synthwave） */
+/* 编辑器语法配色映射：dracula */
+:root {
+  --accent-rgb: 255, 110, 199;
+  --accent2-rgb: 255, 159, 67;
+  --accent3-rgb: 162, 89, 255;
+  --blue-rgb: 124, 92, 255;
+  --textmuted-rgb: 240, 190, 215;
+  --bg-deep: #140617;
+  --bg-base: #1a0a23;
+  --bg-far: #2a0f3a;
+  --text-main: #ffe6f5;
+}
