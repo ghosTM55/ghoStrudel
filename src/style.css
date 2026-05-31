@@ -343,7 +343,7 @@ body > canvas {
 .track-list {
   display: grid;
   gap: 8px;
-  max-height: min(42vh, 360px);
+  max-height: min(52vh, 460px);
   margin-top: 12px;
   overflow: auto;
 }
@@ -804,6 +804,52 @@ body > canvas {
   color: rgba(var(--textmuted-rgb), 0.8);
   font-size: 12px;
   line-height: 1.5;
+}
+
+.tutorial-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tutorial-credit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  margin: 0;
+  color: rgba(var(--textmuted-rgb), 0.88);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tutorial-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  border-radius: 999px;
+  padding: 4px 9px;
+  color: var(--neon-cyan);
+  background: rgba(var(--accent-rgb), 0.07);
+  text-decoration: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
+}
+
+.tutorial-social-link:hover,
+.tutorial-social-link:focus-visible {
+  border-color: rgba(var(--accent-rgb), 0.74);
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.22);
+  color: var(--text-main);
+  outline: none;
+}
+
+@media (max-width: 520px) {
+  .tutorial-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 .tutorial-close {
