@@ -82,19 +82,19 @@ body::after {
   background:
     linear-gradient(
       90deg,
-      rgba(1, 5, 14, 0.66) 0%,
-      rgba(1, 5, 14, 0.52) calc(var(--visual-playhead-x) - 18ch),
-      rgba(1, 5, 14, 0.28) var(--visual-playhead-x),
+      rgba(1, 5, 14, 0.54) 0%,
+      rgba(1, 5, 14, 0.40) calc(var(--visual-playhead-x) - 18ch),
+      rgba(1, 5, 14, 0.18) var(--visual-playhead-x),
       transparent 100%
     );
-  backdrop-filter: blur(18px) saturate(0.88) brightness(0.72);
-  -webkit-backdrop-filter: blur(18px) saturate(0.88) brightness(0.72);
+  backdrop-filter: blur(16px) saturate(0.96) brightness(0.86);
+  -webkit-backdrop-filter: blur(16px) saturate(0.96) brightness(0.86);
   mask-image:
     linear-gradient(
       90deg,
       black 0%,
       black calc(var(--visual-playhead-x) - 10ch),
-      rgba(0, 0, 0, 0.72) var(--visual-playhead-x),
+      rgba(0, 0, 0, 0.58) var(--visual-playhead-x),
       transparent 100%
     );
 }
@@ -464,10 +464,10 @@ body > canvas {
 /* inline 可视化（._pianoroll / ._punchcard）：垫深色底 + 主题色描边，
    从全屏背景音轨里分离出来看得更清楚（全局背景 canvas 在 body 下，不受影响）*/
 #editor-mount .cm-content canvas {
-  background: rgba(0, 0, 0, 0.62);
-  border: 1px solid rgba(var(--accent-rgb), 0.28);
+  background: rgba(0, 0, 0, 0.44);
+  border: 1px solid rgba(var(--accent-rgb), 0.36);
   border-radius: 6px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.38);
   margin: 3px 0;
 }
 
