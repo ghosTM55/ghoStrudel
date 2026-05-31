@@ -97,13 +97,29 @@ let full = stack(drums, bass, keys, stab, lead, brake)
 let breakdown = stack(keys.gain(.15), bass.gain(.26), rim, brake.delay(.4))
 let outro = stack(keys.gain(.15), stab.gain(.08), bass.gain(.18))
 
-arrange(
+// 真实播放编曲：保留鼓、质感噪声和 delay 的原始听感
+let audio = arrange(
   [8, intro],
   [16, groove],
   [16, full],
   [8, breakdown],
   [16, full],
   [8, outro]
+)
+
+// 背景 pianoroll 的旋律参考层：只放有音高的声部，避免 mixed stack 漏画旋律事件
+let visualGuide = arrange(
+  [8, stack(keys, stab, bass.gain(.22), brake)],
+  [16, stack(bass, keys, stab)],
+  [16, stack(bass, keys, stab, lead, brake)],
+  [8, stack(keys.gain(.15), bass.gain(.26), brake.delay(.4))],
+  [16, stack(bass, keys, stab, lead, brake)],
+  [8, stack(keys.gain(.15), stab.gain(.08), bass.gain(.18))]
+)
+
+stack(
+  audio,
+  visualGuide.gain(0)
 )
   .late("[0 .008]*2")
   .pianoroll({

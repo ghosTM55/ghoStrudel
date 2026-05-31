@@ -85,13 +85,29 @@ let full = stack(drums, bass, oud, ney, mirage, drone)
 let drop = stack(kick, bass, darbuka, tabla, mirage.gain(.1), ney.delay(.45))
 let outro = stack(drone, oud.gain(.1), mirage.gain(.04))
 
-arrange(
+// 真实播放编曲：保留鼓、尾音和 drop 的原始听感
+let audio = arrange(
   [8, intro],
   [16, groove],
   [16, full],
   [8, drop],
   [16, full],
   [8, outro]
+)
+
+// 背景 pianoroll 的旋律参考层：只放有音高的声部，避免 mixed stack 漏画旋律事件
+let visualGuide = arrange(
+  [8, stack(drone, oud, mirage.gain(.045))],
+  [16, stack(bass, oud, mirage)],
+  [16, stack(bass, oud, ney, mirage, drone)],
+  [8, stack(bass, mirage.gain(.1), ney.delay(.45))],
+  [16, stack(bass, oud, ney, mirage, drone)],
+  [8, stack(drone, oud.gain(.1), mirage.gain(.04))]
+)
+
+stack(
+  audio,
+  visualGuide.gain(0)
 )
   .late("[0 .004]*4")
   .pianoroll({

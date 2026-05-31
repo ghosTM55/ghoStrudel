@@ -303,13 +303,29 @@ let outro = stack(
   vocalHalo.gain(.35)
 )
 
-arrange(
+// 真实播放编曲：保留鼓组、vocal 层和段落动态的原始听感
+let audio = arrange(
   [8, intro],
   [8, build],
   [8, drop],
   [24, breakdown],
   [16, final],
   [8, outro]
+)
+
+// 背景 pianoroll 的旋律参考层：只放有音高的声部，避免 mixed stack 漏画旋律事件
+let visualGuide = arrange(
+  [8, stack(arpSoft, pad)],
+  [8, stack(arpSoft, pad, bassBuild, vocalHalo.gain(.45))],
+  [8, stack(bass, pad, arpFlow, pianoChords, melody, tenderAnswer, breathVox, vocalHalo)],
+  [24, stack(bassDrive, strings.gain(.4), pianoChords.gain(.55), vocalMoan, vocalHalo.gain(.75))],
+  [16, stack(bass, pad, arpFlow, pianoChords, melody, tenderAnswer.gain(.9), breathVox.gain(.85), vocalHalo.gain(.9), strings.gain(.11))],
+  [8, stack(arpSoft, pad, vocalHalo.gain(.35))]
+)
+
+stack(
+  audio,
+  visualGuide.gain(0)
 )
   .late("[0 .004]*4")
   .pianoroll({

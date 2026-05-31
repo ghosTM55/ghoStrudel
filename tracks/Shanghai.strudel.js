@@ -93,13 +93,29 @@ let full = stack(drums, bass, ep, glass, hook, talk)
 let bridge = stack(ep.gain(.16), glass.gain(.11), hook.delay(.35), rim)
 let outro = stack(ep, glass.gain(.05))
 
-arrange(
+// 真实播放编曲：保留 disco/funk 鼓和原始段落听感
+let audio = arrange(
   [8, intro],
   [16, groove],
   [16, full],
   [8, bridge],
   [16, full],
   [8, outro]
+)
+
+// 背景 pianoroll 的旋律参考层：只放有音高的声部，避免 mixed stack 漏画旋律事件
+let visualGuide = arrange(
+  [8, stack(ep, glass)],
+  [16, stack(bass, ep, glass)],
+  [16, stack(bass, ep, glass, hook, talk)],
+  [8, stack(ep.gain(.16), glass.gain(.11), hook.delay(.35))],
+  [16, stack(bass, ep, glass, hook, talk)],
+  [8, stack(ep, glass.gain(.05))]
+)
+
+stack(
+  audio,
+  visualGuide.gain(0)
 )
   .late("[0 .004]*4")
   .pianoroll({
