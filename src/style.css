@@ -82,19 +82,19 @@ body::after {
   background:
     linear-gradient(
       90deg,
-      rgba(1, 5, 14, 0.54) 0%,
-      rgba(1, 5, 14, 0.40) calc(var(--visual-playhead-x) - 18ch),
-      rgba(1, 5, 14, 0.18) var(--visual-playhead-x),
+      rgba(1, 5, 14, 0.42) 0%,
+      rgba(1, 5, 14, 0.30) calc(var(--visual-playhead-x) - 18ch),
+      rgba(1, 5, 14, 0.12) var(--visual-playhead-x),
       transparent 100%
     );
-  backdrop-filter: blur(16px) saturate(0.96) brightness(0.86);
-  -webkit-backdrop-filter: blur(16px) saturate(0.96) brightness(0.86);
+  backdrop-filter: blur(14px) saturate(1.02) brightness(0.94);
+  -webkit-backdrop-filter: blur(14px) saturate(1.02) brightness(0.94);
   mask-image:
     linear-gradient(
       90deg,
       black 0%,
       black calc(var(--visual-playhead-x) - 10ch),
-      rgba(0, 0, 0, 0.58) var(--visual-playhead-x),
+      rgba(0, 0, 0, 0.44) var(--visual-playhead-x),
       transparent 100%
     );
 }
