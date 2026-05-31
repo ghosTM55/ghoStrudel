@@ -6,6 +6,8 @@ ghoStrudel es un espacio de trabajo local en el navegador para escribir, reprodu
 
 Úsalo para mantener tus propios bocetos `.strudel.js` en un solo lugar, tocarlos en el navegador y remezclar rápidamente las pistas de ejemplo incluidas para crear nuevos arreglos.
 
+![Interfaz de ghoStrudel con la pista Shanghai y visuales pianoroll de fondo](./src/ghostrudel-screenshot.jpg)
+
 ## Inicio rápido
 
 ```bash

@@ -6,6 +6,8 @@ ghoStrudel is a local browser workspace for writing, playing and switching [Stru
 
 Use it to keep your own `.strudel.js` sketches in one place, perform them in the browser, and quickly remix the included sample tracks into new arrangements.
 
+![ghoStrudel interface showing the Shanghai track with background pianoroll visuals](./src/ghostrudel-screenshot.jpg)
+
 ## Quick start
 
 ```bash

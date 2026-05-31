@@ -6,6 +6,8 @@ ghoStrudel 是一个本地浏览器里的 [Strudel](https://strudel.cc) 编曲 /
 
 你可以把自己的 `.strudel.js` 草稿集中放在这里，在浏览器里播放、切换、现场修改，也可以基于内置 sample 曲目快速 remix 出新的编排。
 
+![ghoStrudel 界面：Shanghai 曲目与背景 pianoroll 可视化](./src/ghostrudel-screenshot.jpg)
+
 ## 快速开始
 
 ```bash
