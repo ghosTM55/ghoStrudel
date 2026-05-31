@@ -94,7 +94,7 @@ arrange(
   [8, outro]
 )
   .late("[0 .004]*4")
-  .punchcard({
+  .pianoroll({
     cycles: 16,
     playhead: .40,
     fold: 1,
